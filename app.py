@@ -28,7 +28,7 @@ st.write("""
    - 難易度15: +5点  
    - 難易度20: 1段階昇格（例: 外周 → 中間、中間 → 中心）  
    - 難易度25: 2段階昇格（例: 外周 → 中間 → 中心）  
-   - 既に中心（20点）の場合、+10点ずつ加点
+   - 既に中心（20点）の場合、+10点ずつ加点  
 3. **スピード（SPD判定）**: 【SPD】+1d10で判定し、得点倍率を決定します。  
    - 難易度15: ×2  
    - 難易度20: ×3  
@@ -59,17 +59,30 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
         base_score = 20  # 中心
         zone = "中心"
 
+    # 基礎得点を表示
+    st.subheader("🎯 結果")
+    st.write(f"出目: {base_roll} → 基礎得点: {base_score}点（{zone}）")
+
     # DEX判定
     dex_roll = dex + random.randint(1, 10)
-    dex_bonus = 0
-    if dex_roll >= 15:
-        dex_bonus = 5
-    if dex_roll >= 20:
-        dex_bonus = 10
-        base_score = min(base_score + 10, 20)  # 1段階昇格
-    if dex_roll >= 25:
-        dex_bonus = 20
-        base_score = min(base_score + 20, 20)  # 2段階昇格
+    st.write(f"DEX判定: {dex} + 1d10 → {dex_roll}")
+    if dex_roll >= 15 and dex_roll < 20:
+        st.write("昇格なし: +5点を加算")
+        base_score += 5
+    elif dex_roll >= 20 and dex_roll < 25:
+        if base_score < 20:  # 昇格可能
+            base_score = min(base_score + 10, 20)  # 1段階昇格
+            st.write(f"1段階昇格: 昇格後得点: {base_score}点")
+        else:
+            base_score += 10  # 中心で+10点
+            st.write(f"中心加点: {base_score}点")
+    elif dex_roll >= 25:
+        if base_score < 20:  # 昇格可能
+            base_score = min(base_score + 20, 20)  # 2段階昇格
+            st.write(f"2段階昇格: 昇格後得点: {base_score}点")
+        else:
+            base_score += 10  # 中心で+10点
+            st.write(f"中心加点: {base_score}点")
 
     # SPD判定
     spd_roll = spd + random.randint(1, 10)
@@ -80,22 +93,16 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
         multiplier = 3
     if spd_roll >= 25:
         multiplier = 5
+    st.write(f"SPD判定: {spd} + 1d10 → {spd_roll} → 倍率: ×{multiplier}")
 
     # 組み合わせボーナス
     combo_bonus = 0
     if dex_roll >= 20 and spd_roll >= 20:
         combo_bonus = 10
+    st.write(f"組み合わせボーナス: +{combo_bonus}点")
 
     # 最終得点計算
     final_score = base_score * multiplier + combo_bonus
-
-    # プレイ結果を表示
-    st.subheader("🎯 結果")
-    st.write(f"出目: {base_roll} → 得点: {base_score}点（{zone}）")
-    st.write(f"DEX判定: {dex} + 1d10 → {dex_roll} → ボーナス: +{dex_bonus}点")
-    st.write(f"SPD判定: {spd} + 1d10 → {spd_roll} → 倍率: ×{multiplier}")
-    if combo_bonus > 0:
-        st.write(f"組み合わせボーナス: +{combo_bonus}点")
     st.write(f"最終得点: **{final_score}点**")
 
     # プレイ回数を増やす
