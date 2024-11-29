@@ -86,14 +86,14 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
         final_zone = "外周"
     elif base_score == 15:
         final_zone = "中間"
-    elif base_score == 20:
+    elif base_score == 20 or base_score == 25:  # 25も「中心」とする
         final_zone = "中心"
     elif base_score == 30:
         final_zone = "中心+"
     elif base_score == 40:
         final_zone = "中心++"
     else:
-        final_zone = ""
+        final_zone = "不明"  # その他の値に対する保険
 
     st.write(f"昇格後得点: {base_score}点（{final_zone}）")
 
