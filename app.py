@@ -68,15 +68,14 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
     dex_roll = dex + dex_random
     st.write(f"DEX判定: {dex} + 1d10({dex_random}) → {dex_roll}")
     if dex_roll >= 15 and dex_roll < 20:
-        st.write("昇格なし: +5点を加算")
-        base_score += 5
+        base_score += 5  # +5点
     elif dex_roll >= 20 and dex_roll < 25:
-        if base_score < 20:  # 昇格可能
+        if base_score < 20:
             base_score = min(base_score + 10, 20)  # 1段階昇格
         else:
             base_score += 10  # 中心で+10点
     elif dex_roll >= 25:
-        if base_score < 20:  # 昇格可能
+        if base_score < 20:
             base_score = min(base_score + 20, 20)  # 2段階昇格
         else:
             base_score += 10  # 中心で+10点
@@ -86,14 +85,14 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
         final_zone = "外周"
     elif base_score == 15:
         final_zone = "中間"
-    elif base_score == 20 or base_score == 25:  # 25も「中心」とする
+    elif base_score == 20 or base_score == 25:
         final_zone = "中心"
     elif base_score == 30:
         final_zone = "中心+"
     elif base_score == 40:
         final_zone = "中心++"
     else:
-        final_zone = "不明"  # その他の値に対する保険
+        final_zone = "不明"
 
     st.write(f"昇格後得点: {base_score}点（{final_zone}）")
 
@@ -110,14 +109,29 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
     st.write(f"SPD判定: {spd} + 1d10({spd_random}) → {spd_roll} → 倍率: ×{multiplier}")
 
     # 組み合わせボーナス
-    combo_bonus = 0
-    if dex_roll >= 20 and spd_roll >= 20:
-        combo_bonus = 10
+    combo_bonus = 10 if dex_roll >= 20 and spd_roll >= 20 else 0
     st.write(f"組み合わせボーナス: +{combo_bonus}点")
 
     # 最終得点計算
     final_score = base_score * multiplier + combo_bonus
     st.write(f"最終得点: **{final_score}点**")
+
+    # モノルンのコメント
+    if final_score <= 15:
+        st.write("画面に赤い警告灯が点滅。画面に表示されたモノルンの表情は見えない。")
+        st.write("『結果: 低得点ゾーン。再計算の必要性: 0%。プレイヤーの精度向上を推奨。』")
+    elif final_score <= 30:
+        st.write("画面に冷たい青い光が走る。画面の中でモノルンの目が微かに光る。")
+        st.write("『平均以下。未来技術を活用するなら、これでは不足です。追加データが求められます。』")
+    elif final_score <= 50:
+        st.write("淡い緑のライトが画面を照らす。モノルンの機嫌は悪くなさそうだ。")
+        st.write("『結果: 安定したスコアです。しかし、さらなる向上が可能と見受けられます。』")
+    elif final_score <= 70:
+        st.write("金色の光がモノルンの顔を飾る。軽快な音楽が流れている。")
+        st.write("『優秀な結果。あなたの成長曲線は非常に興味深いです。次も同様の結果を期待します。』")
+    else:
+        st.write("『驚異的なスコア。これを超える挑戦者は、データベースには存在しません。あなたは伝説となりました。』")
+        st.write("大げさだ。きっとお世辞だろう。しかし、虹色に光る画面の中で、モノルンは踊っていた。")
 
     # プレイ回数を増やす
     st.session_state["play_count"] += 1
