@@ -64,28 +64,42 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
     st.write(f"出目: {base_roll} → 基礎得点: {base_score}点（{zone}）")
 
     # DEX判定
-    dex_roll = dex + random.randint(1, 10)
-    st.write(f"DEX判定: {dex} + 1d10 → {dex_roll}")
+    dex_random = random.randint(1, 10)  # 1d10の結果
+    dex_roll = dex + dex_random
+    st.write(f"DEX判定: {dex} + 1d10({dex_random}) → {dex_roll}")
     if dex_roll >= 15 and dex_roll < 20:
         st.write("昇格なし: +5点を加算")
         base_score += 5
     elif dex_roll >= 20 and dex_roll < 25:
         if base_score < 20:  # 昇格可能
             base_score = min(base_score + 10, 20)  # 1段階昇格
-            st.write(f"1段階昇格: 昇格後得点: {base_score}点")
         else:
             base_score += 10  # 中心で+10点
-            st.write(f"中心加点: {base_score}点")
     elif dex_roll >= 25:
         if base_score < 20:  # 昇格可能
             base_score = min(base_score + 20, 20)  # 2段階昇格
-            st.write(f"2段階昇格: 昇格後得点: {base_score}点")
         else:
             base_score += 10  # 中心で+10点
-            st.write(f"中心加点: {base_score}点")
+
+    # 昇格後得点のラベル付け
+    if base_score == 10:
+        final_zone = "外周"
+    elif base_score == 15:
+        final_zone = "中間"
+    elif base_score == 20:
+        final_zone = "中心"
+    elif base_score == 30:
+        final_zone = "中心+"
+    elif base_score == 40:
+        final_zone = "中心++"
+    else:
+        final_zone = ""
+
+    st.write(f"昇格後得点: {base_score}点（{final_zone}）")
 
     # SPD判定
-    spd_roll = spd + random.randint(1, 10)
+    spd_random = random.randint(1, 10)  # 1d10の結果
+    spd_roll = spd + spd_random
     multiplier = 1
     if spd_roll >= 15:
         multiplier = 2
@@ -93,7 +107,7 @@ if st.session_state["play_count"] < 1 and st.button("プレイする"):
         multiplier = 3
     if spd_roll >= 25:
         multiplier = 5
-    st.write(f"SPD判定: {spd} + 1d10 → {spd_roll} → 倍率: ×{multiplier}")
+    st.write(f"SPD判定: {spd} + 1d10({spd_random}) → {spd_roll} → 倍率: ×{multiplier}")
 
     # 組み合わせボーナス
     combo_bonus = 0
